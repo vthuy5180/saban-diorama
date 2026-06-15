@@ -48,8 +48,14 @@
 
     function update() {
       fetch("https://api.thingspeak.com/channels/3407526/feeds/last.json")
-        .then(r => r.json()).then(d => {
-          let b = parseInt(d.field1), dn = parseInt(d.field2);
+        .then(r => r.json())
+        .then(d => {
+          let b = parseInt(d.field1);
+          let dn = parseInt(d.field2);
+          
+          // BẢO VỆ 1: Chống lỗi hiển thị "NaN" nếu API ThingSpeak phản hồi chậm
+          if (isNaN(b) || isNaN(dn)) return; 
+
           document.getElementById('buiVal').innerText = b;
           document.getElementById('denVal').innerText = dn + '%';
           
@@ -58,28 +64,39 @@
           let body = document.getElementById('bg');
           
           // 1. Xác định trạng thái thực tế từ dữ liệu
-          let currentState = "";
-          if(b < 1500) currentState = "Xanh";
-          else if(b < 2500) currentState = "Vang";
-          else currentState = "Do";
+          let trueState = "";
+          if (b < 1500) trueState = "Xanh";
+          else if (b < 2500) trueState = "Vang";
+          else trueState = "Do";
 
-          // 2. Logic ép buộc chuyển màu tuần tự:
-          // Nếu đang là Xanh mà nhảy vọt lên Đỏ -> Ép thành Vàng trước
-          if (lastState === "Xanh" && currentState === "Do") {
-            currentState = "Vang";
+          let displayState = trueState;
+
+          // BẢO VỆ 2: Logic ép buộc chuyển màu tuần tự cho CẢ 2 CHIỀU (Tăng và Giảm)
+          if (lastState === "Xanh" && trueState === "Do") {
+            displayState = "Vang"; // Bụi tăng đột ngột -> Ép qua Vàng
+          }
+          if (lastState === "Do" && trueState === "Xanh") {
+            displayState = "Vang"; // Khói tan đột ngột -> Ép qua Vàng
           }
 
-          // 3. Cập nhật giao diện
-          if (currentState === "Xanh") {
-            img.src='4.png'; body.style.background='#eafff0'; msg.innerText='Không khí nhà bạn đang rất trong lành';
-          } else if (currentState === "Vang") {
-            img.src='5.png'; body.style.background='#fffde7'; msg.innerText='Không khí nhà bạn đang không tốt mức trung bình';
+          // 3. Cập nhật giao diện với các câu chữ của bạn
+          if (displayState === "Xanh") {
+            img.src='4.png'; 
+            body.style.background='#eafff0'; 
+            msg.innerText='Không khí nhà bạn đang rất trong lành';
+          } else if (displayState === "Vang") {
+            img.src='5.png'; 
+            body.style.background='#fffde7'; 
+            msg.innerText='Không khí nhà bạn đang không tốt mức trung bình';
           } else {
-            img.src='6.png'; body.style.background='#ffebee'; msg.innerText='Không khí nhà bạn đang ở mức nguy hiểm!';
+            img.src='6.png'; 
+            body.style.background='#ffebee'; 
+            msg.innerText='Không khí nhà bạn đang ở mức nguy hiểm!';
           }
 
-          lastState = currentState; // Cập nhật trạng thái để so sánh cho lần tới
-        });
+          lastState = displayState; // Cập nhật trạng thái để so sánh cho lần tới
+        })
+        .catch(err => console.log("Đang kết nối lại...", err));
     }
 
     setInterval(update, 3000); // Quét mỗi 3 giây
