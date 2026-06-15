@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Diorama App</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background 0.5s; text-align: center; margin: 0; padding: 30px 15px; color: #333; }
+  .green { background: #eafff0; } .green-text { color: #2e7d32; }
+  .yellow { background: #fffde7; } .yellow-text { color: #f57f17; }
+  .red { background: #ffebee; } .red-text { color: #c62828; }
+  h1 { font-size: 32px; margin-bottom: 5px; color: inherit; }
+  .location { font-size: 16px; font-weight: bold; margin-top: 0; color: #111; }
+  .icon { font-size: 100px; margin: 20px 0; transition: transform 0.3s; }
+  .status-text { font-size: 20px; font-weight: 600; margin: 20px 0; padding: 0 20px;}
+  .card-container { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+  .card { background: white; border-radius: 20px; padding: 25px 15px; width: 45%; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+  .card h4 { margin: 0; font-size: 16px; font-weight: bold; }
+  .card h2 { margin: 15px 0 0 0; font-size: 28px; color: #222; }
+</style>
+</head>
+<body id="bg" class="green">
+  <h1 id="title" class="green-text">Xin chào,</h1>
+  <p class="location">📍 TP.HCM</p>
+  
+  <div id="icon" class="icon">🍃</div>
+  <div id="statusMsg" class="status-text green-text">Không khí nhà bạn đang rất trong lành</div>
+
+  <div class="card-container">
+    <div class="card">
+      <h4 id="c1" class="green-text">Mật độ bụi</h4>
+      <h2 id="buiVal">--</h2>
+    </div>
+    <div class="card">
+      <h4 id="c2" class="green-text">Thông số đèn</h4>
+      <h2 id="denVal">--%</h2>
+    </div>
+  </div>
+
+  <script>
+    // ĐIỀN CHANNEL ID CỦA BẠN VÀO ĐÂY (Ví dụ: 2519364)
+    const channelID = "3407526"; 
+    
+    function fetchThingSpeak() {
+      // Dùng API Read của ThingSpeak để lấy dòng dữ liệu mới nhất
+      fetch(`https://api.thingspeak.com/channels/${channelID}/feeds/last.json`)
+        .then(response => response.json())
+        .then(data => {
+          let bui = parseInt(data.field1);
+          let den = parseInt(data.field2);
+
+          document.getElementById('buiVal').innerText = bui;
+          document.getElementById('denVal').innerText = den + '%';
+          
+          let bg = document.getElementById('bg');
+          let title = document.getElementById('title');
+          let msg = document.getElementById('statusMsg');
+          let c1 = document.getElementById('c1');
+          let c2 = document.getElementById('c2');
+          let icon = document.getElementById('icon');
+
+          // Logic đổi màu giao diện
+          if (bui < 1500) {
+            bg.className = 'green'; icon.innerText = '🍃'; msg.innerText = 'Không khí nhà bạn đang rất trong lành';
+            title.className = msg.className = c1.className = c2.className = 'green-text';
+          } else if (bui < 2500) {
+            bg.className = 'yellow'; icon.innerText = '🍂'; msg.innerText = 'Không khí nhà bạn đang không tốt';
+            title.className = msg.className = c1.className = c2.className = 'yellow-text';
+          } else {
+            bg.className = 'red'; icon.innerText = '🌵'; msg.innerText = 'Không khí nhà bạn đang ở mức cảnh báo';
+            title.className = msg.className = c1.className = c2.className = 'red-text';
+          }
+        })
+        .catch(error => console.error("Lỗi lấy dữ liệu:", error));
+    }
+
+    // Tự động quét cập nhật mỗi 15 giây
+    setInterval(fetchThingSpeak, 15000);
+    // Gọi ngay 1 lần khi vừa mở file
+    fetchThingSpeak(); 
+  </script>
+</body>
+</html>
