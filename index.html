@@ -13,6 +13,7 @@
   .card-container { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
   .card { background: white; padding: 15px; border-radius: 15px; width: 45%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
   
+  /* Cấu trúc biểu đồ nằm dưới */
   .chart-section { display: flex; flex-direction: column; gap: 15px; align-items: center; }
   .chart-wrapper { width: 100%; max-width: 500px; background: white; padding: 10px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
   iframe { width: 100%; height: 200px; border: none; }
@@ -24,7 +25,7 @@
   <p class="loc">📍 TP.HCM</p>
   
   <img src="4.png" class="custom-icon" id="mainIcon">
-  <div id="statusMsg" class="status-text">Đang tải dữ liệu...</div>
+  <div id="statusMsg" class="status-text">Đang kết nối...</div>
 
   <div class="card-container">
     <div class="card"><h4>Mật độ bụi</h4><h2 id="buiVal">--</h2></div>
@@ -43,6 +44,8 @@
   </div>
 
   <script>
+    let lastState = "Xanh"; // Lưu trạng thái cũ để bắt buộc chuyển tuần tự
+
     function update() {
       fetch("https://api.thingspeak.com/channels/3407526/feeds/last.json")
         .then(r => r.json()).then(d => {
@@ -54,20 +57,32 @@
           let msg = document.getElementById('statusMsg');
           let body = document.getElementById('bg');
           
-          // Logic 3 trạng thái tách biệt:
-          if(b < 1500) { 
-            // Trạng thái 1: Xanh
-            img.src='4.png'; body.style.background='#eafff0'; msg.innerText='Không khí trong lành'; 
-          } else if(b >= 1500 && b < 2500) { 
-            // Trạng thái 2: Vàng (Trung bình)
-            img.src='5.png'; body.style.background='#fffde7'; msg.innerText='Không khí mức trung bình'; 
-          } else { 
-            // Trạng thái 3: Đỏ (Cảnh báo)
-            img.src='6.png'; body.style.background='#ffebee'; msg.innerText='Cảnh báo mức nguy hiểm!'; 
+          // 1. Xác định trạng thái thực tế từ dữ liệu
+          let currentState = "";
+          if(b < 1500) currentState = "Xanh";
+          else if(b < 2500) currentState = "Vang";
+          else currentState = "Do";
+
+          // 2. Logic ép buộc chuyển màu tuần tự:
+          // Nếu đang là Xanh mà nhảy vọt lên Đỏ -> Ép thành Vàng trước
+          if (lastState === "Xanh" && currentState === "Do") {
+            currentState = "Vang";
           }
+
+          // 3. Cập nhật giao diện
+          if (currentState === "Xanh") {
+            img.src='4.png'; body.style.background='#eafff0'; msg.innerText='Không khí rất trong lành';
+          } else if (currentState === "Vang") {
+            img.src='5.png'; body.style.background='#fffde7'; msg.innerText='Không khí mức trung bình';
+          } else {
+            img.src='6.png'; body.style.background='#ffebee'; msg.innerText='Cảnh báo: Mức nguy hiểm!';
+          }
+
+          lastState = currentState; // Cập nhật trạng thái để so sánh cho lần tới
         });
     }
-    setInterval(update, 3000);
+
+    setInterval(update, 3000); // Quét mỗi 3 giây
     update();
   </script>
 </body>
