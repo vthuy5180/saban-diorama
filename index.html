@@ -71,11 +71,11 @@
 
           // 3. Cập nhật giao diện
           if (currentState === "Xanh") {
-            img.src='4.png'; body.style.background='#eafff0'; msg.innerText='Không khí rất trong lành';
+            img.src='4.png'; body.style.background='#eafff0'; msg.innerText='Không khí nhà bạn đang rất trong lành';
           } else if (currentState === "Vang") {
-            img.src='5.png'; body.style.background='#fffde7'; msg.innerText='Không khí mức trung bình';
+            img.src='5.png'; body.style.background='#fffde7'; msg.innerText='Không khí nhà bạn đang không tốt mức trung bình';
           } else {
-            img.src='6.png'; body.style.background='#ffebee'; msg.innerText='Cảnh báo: Mức nguy hiểm!';
+            img.src='6.png'; body.style.background='#ffebee'; msg.innerText='Không khí nhà bạn đang ở mức nguy hiểm!';
           }
 
           lastState = currentState; // Cập nhật trạng thái để so sánh cho lần tới
