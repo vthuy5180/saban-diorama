@@ -5,24 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Diorama</title>
 <style>
-  body { font-family: sans-serif; text-align: center; padding: 20px; transition: background 0.5s; }
-  .custom-icon { height: 150px; margin: 10px 0; }
-  .card-container { display: flex; gap: 10px; justify-content: center; }
+  body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px 10px; transition: background 0.5s; margin: 0; }
+  h1 { font-size: 28px; margin: 10px 0 5px; }
+  .loc { font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #555; }
+  .custom-icon { height: 140px; margin: 10px 0; }
+  .status-text { font-size: 18px; font-weight: 600; margin-bottom: 20px; min-height: 24px; }
+  .card-container { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
   .card { background: white; padding: 15px; border-radius: 15px; width: 45%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-  iframe { width: 100%; max-width: 500px; height: 200px; border: none; margin-top: 10px; }
+  
+  /* Cấu trúc biểu đồ nằm dưới */
+  .chart-section { display: flex; flex-direction: column; gap: 15px; align-items: center; }
+  .chart-wrapper { width: 100%; max-width: 500px; background: white; padding: 10px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+  .chart-wrapper h4 { margin: 5px 0; font-size: 14px; }
+  iframe { width: 100%; height: 200px; border: none; }
 </style>
 </head>
 <body id="bg" style="background:#eafff0">
-  <h1>Smart Diorama</h1>
+  
+  <h1 id="title">Xin chào,</h1>
+  <p class="loc">📍 TP.HCM</p>
+  
   <img src="4.png" class="custom-icon" id="mainIcon">
+  <div id="statusMsg" class="status-text">Không khí trong lành</div>
+
   <div class="card-container">
-    <div class="card"><h4>Bụi</h4><h2 id="buiVal">--</h2></div>
-    <div class="card"><h4>Đèn</h4><h2 id="denVal">--%</h2></div>
+    <div class="card"><h4>Mật độ bụi</h4><h2 id="buiVal">--</h2></div>
+    <div class="card"><h4>Thông số đèn</h4><h2 id="denVal">--%</h2></div>
   </div>
   
   <div class="chart-section">
-    <iframe src="https://thingspeak.com/channels/3407526/charts/1?dynamic=true&results=30&type=line"></iframe>
-    <iframe src="https://thingspeak.com/channels/3407526/charts/2?dynamic=true&results=30&type=line"></iframe>
+    <div class="chart-wrapper">
+      <h4>Biểu đồ Bụi</h4>
+      <iframe src="https://thingspeak.com/channels/3407526/charts/1?dynamic=true&results=30&type=line"></iframe>
+    </div>
+    <div class="chart-wrapper">
+      <h4>Biểu đồ Đèn</h4>
+      <iframe src="https://thingspeak.com/channels/3407526/charts/2?dynamic=true&results=30&type=line"></iframe>
+    </div>
   </div>
 
   <script>
@@ -32,13 +51,21 @@
           let b = parseInt(d.field1), dn = parseInt(d.field2);
           document.getElementById('buiVal').innerText = b;
           document.getElementById('denVal').innerText = dn + '%';
+          
           let img = document.getElementById('mainIcon');
-          if(b < 1500) { img.src='4.png'; document.body.style.background='#eafff0'; }
-          else if(b < 2500) { img.src='5.png'; document.body.style.background='#fffde7'; }
-          else { img.src='6.png'; document.body.style.background='#ffebee'; }
+          let msg = document.getElementById('statusMsg');
+          let body = document.getElementById('bg');
+          
+          if(b < 1500) { 
+            img.src='4.png'; body.style.background='#eafff0'; msg.innerText='Không khí rất trong lành'; 
+          } else if(b < 2500) { 
+            img.src='5.png'; body.style.background='#fffde7'; msg.innerText='Không khí không tốt'; 
+          } else { 
+            img.src='6.png'; body.style.background='#ffebee'; msg.innerText='Mức cảnh báo!'; 
+          }
         });
     }
-    setInterval(update, 3000); // Tốc độ quét 3s/lần cực nhanh
+    setInterval(update, 3000);
     update();
   </script>
 </body>
