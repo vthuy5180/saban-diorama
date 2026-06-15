@@ -3,105 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Diorama App</title>
+<title>Smart Diorama</title>
 <style>
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background 0.5s; text-align: center; margin: 0; padding: 30px 15px; color: #333; }
-  .green { background: #eafff0; } .green-text { color: #2e7d32; }
-  .yellow { background: #fffde7; } .yellow-text { color: #f57f17; }
-  .red { background: #ffebee; } .red-text { color: #c62828; }
-  h1 { font-size: 32px; margin-bottom: 5px; color: inherit; }
-  .location { font-size: 16px; font-weight: bold; margin-top: 0; color: #111; }
-  
-  /* Căn chỉnh ảnh icon của bạn */
-  .custom-icon { height: 160px; margin: 15px 0; transition: transform 0.3s; }
-  
-  .status-text { font-size: 20px; font-weight: 600; margin: 10px 0 20px; padding: 0 20px;}
-  .card-container { display: flex; gap: 15px; justify-content: center; margin-top: 10px; }
-  .card { background: white; border-radius: 20px; padding: 25px 15px; width: 45%; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-  .card h4 { margin: 0; font-size: 16px; font-weight: bold; }
-  .card h2 { margin: 15px 0 0 0; font-size: 28px; color: #222; }
-  
-  /* Khung chứa biểu đồ */
-  .chart-container { margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-  .chart-box { background: white; border-radius: 20px; padding: 15px; width: 90%; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-  iframe { width: 100%; height: 260px; border: none; border-radius: 10px; }
+  body { font-family: sans-serif; text-align: center; padding: 20px; transition: background 0.5s; }
+  .custom-icon { height: 150px; margin: 10px 0; }
+  .card-container { display: flex; gap: 10px; justify-content: center; }
+  .card { background: white; padding: 15px; border-radius: 15px; width: 45%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  iframe { width: 100%; max-width: 500px; height: 200px; border: none; margin-top: 10px; }
 </style>
 </head>
-<body id="bg" class="green">
-  <h1 id="title" class="green-text">Xin chào,</h1>
-  <p class="location">📍 TP.HCM</p>
-  
-  <div id="iconBox">
-    <img src="4.jpg" class="custom-icon" id="mainIcon">
-  </div>
-  
-  <div id="statusMsg" class="status-text green-text">Không khí nhà bạn đang rất trong lành</div>
-
+<body id="bg" style="background:#eafff0">
+  <h1>Smart Diorama</h1>
+  <img src="4.jpg" class="custom-icon" id="mainIcon">
   <div class="card-container">
-    <div class="card">
-      <h4 id="c1" class="green-text">Mật độ bụi</h4>
-      <h2 id="buiVal">--</h2>
-    </div>
-    <div class="card">
-      <h4 id="c2" class="green-text">Thông số đèn</h4>
-      <h2 id="denVal">--%</h2>
-    </div>
+    <div class="card"><h4>Bụi</h4><h2 id="buiVal">--</h2></div>
+    <div class="card"><h4>Đèn</h4><h2 id="denVal">--%</h2></div>
   </div>
-
-  <div class="chart-container">
-    <div class="chart-box">
-      <iframe src="https://thingspeak.com/channels/CHANNEL_ID_CUA_BAN/charts/1?bgcolor=%23ffffff&color=%232e7d32&dynamic=true&results=30&type=line&update=15&title=Lịch%20sử%20Bụi"></iframe>
-    </div>
-    <div class="chart-box">
-      <iframe src="https://thingspeak.com/channels/CHANNEL_ID_CUA_BAN/charts/2?bgcolor=%23ffffff&color=%23f57f17&dynamic=true&results=30&type=line&update=15&title=Độ%20sáng%20Đèn"></iframe>
-    </div>
+  
+  <div class="chart-section">
+    <iframe src="https://thingspeak.com/channels/3407526/charts/1?dynamic=true&results=30&type=line"></iframe>
+    <iframe src="https://thingspeak.com/channels/3407526/charts/2?dynamic=true&results=30&type=line"></iframe>
   </div>
 
   <script>
-    // Thay CHANNEL_ID_CUA_BAN ở đây
-    const channelID = "3407526"; 
-    
-    function fetchThingSpeak() {
-      fetch(`https://api.thingspeak.com/channels/${channelID}/feeds/last.json`)
-        .then(response => response.json())
-        .then(data => {
-          let bui = parseInt(data.field1);
-          let den = parseInt(data.field2);
-
-          document.getElementById('buiVal').innerText = bui;
-          document.getElementById('denVal').innerText = den + '%';
-          
-          let bg = document.getElementById('bg');
-          let title = document.getElementById('title');
-          let msg = document.getElementById('statusMsg');
-          let c1 = document.getElementById('c1');
-          let c2 = document.getElementById('c2');
-          let icon = document.getElementById('mainIcon');
-
-          // Logic đổi màu giao diện và ĐỔI ẢNH của bạn
-          if (bui < 1500) {
-            bg.className = 'green'; 
-            icon.src = '4.jpg';  // Load ảnh cây xanh
-            msg.innerText = 'Không khí nhà bạn đang rất trong lành';
-            title.className = msg.className = c1.className = c2.className = 'green-text';
-          } else if (bui < 2500) {
-            bg.className = 'yellow'; 
-            icon.src = '5.jpg';  // Load ảnh lá vàng
-            msg.innerText = 'Không khí nhà bạn đang không tốt';
-            title.className = msg.className = c1.className = c2.className = 'yellow-text';
-          } else {
-            bg.className = 'red'; 
-            icon.src = '6.jpg';  // Load ảnh xương rồng đỏ
-            msg.innerText = 'Không khí nhà bạn đang ở mức cảnh báo';
-            title.className = msg.className = c1.className = c2.className = 'red-text';
-          }
-        })
-        .catch(error => console.error("Lỗi lấy dữ liệu:", error));
+    function update() {
+      fetch("https://api.thingspeak.com/channels/3407526/feeds/last.json")
+        .then(r => r.json()).then(d => {
+          let b = parseInt(d.field1), dn = parseInt(d.field2);
+          document.getElementById('buiVal').innerText = b;
+          document.getElementById('denVal').innerText = dn + '%';
+          let img = document.getElementById('mainIcon');
+          if(b < 1500) { img.src='4.jpg'; document.body.style.background='#eafff0'; }
+          else if(b < 2500) { img.src='5.jpg'; document.body.style.background='#fffde7'; }
+          else { img.src='6.jpg'; document.body.style.background='#ffebee'; }
+        });
     }
-
-    // ÉP TỐC ĐỘ: Quét dữ liệu mỗi 3 giây (3000ms) để bắt biến động lẹ nhất
-    setInterval(fetchThingSpeak, 3000);
-    fetchThingSpeak(); 
+    setInterval(update, 3000); // Tốc độ quét 3s/lần cực nhanh
+    update();
   </script>
 </body>
 </html>
