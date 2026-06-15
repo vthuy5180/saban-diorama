@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Diorama</title>
 <style>
-  body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px 10px; transition: background 0.5s; margin: 0; }
+  body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px 10px; transition: background 0.8s ease; margin: 0; }
   h1 { font-size: 28px; margin: 10px 0 5px; }
   .loc { font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #555; }
   .custom-icon { height: 140px; margin: 10px 0; }
@@ -26,7 +26,7 @@
   <p class="loc">📍 TP.HCM</p>
   
   <img src="4.png" class="custom-icon" id="mainIcon">
-  <div id="statusMsg" class="status-text">Không khí trong lành</div>
+  <div id="statusMsg" class="status-text">Đang tải dữ liệu...</div>
 
   <div class="card-container">
     <div class="card"><h4>Mật độ bụi</h4><h2 id="buiVal">--</h2></div>
@@ -56,15 +56,20 @@
           let msg = document.getElementById('statusMsg');
           let body = document.getElementById('bg');
           
+          // Logic 3 tầng chuyển tiếp mượt mà: Xanh -> Cam trung gian -> Đỏ
           if(b < 1500) { 
+            // Trạng thái Xanh
             img.src='4.png'; body.style.background='#eafff0'; msg.innerText='Không khí nhà bạn đang rất trong lành'; 
           } else if(b < 2500) { 
-            img.src='5.png'; body.style.background='#fffde7'; msg.innerText='Không khí nhà bạn đang không tốt'; 
+            // Trạng thái Cam (Trung gian) - Dùng icon 5.png nhưng đổi màu nền sang cam để chuyển tiếp
+            img.src='5.png'; body.style.background='#ffcc80'; msg.innerText='Cảnh báo: Không khí đang xấu dần'; 
           } else { 
-            img.src='6.png'; body.style.background='#ffebee'; msg.innerText='Không khí nhà bạn đang ở mức cảnh báo!'; 
+            // Trạng thái Đỏ
+            img.src='6.png'; body.style.background='#ffcdd2'; msg.innerText='Nguy hiểm: Mức cảnh báo cao!'; 
           }
         });
     }
+    // Tốc độ quét 3s/lần cho phản ứng nhanh như dao cạo
     setInterval(update, 3000);
     update();
   </script>
