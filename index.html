@@ -14,7 +14,7 @@
 </head>
 <body id="bg" style="background:#eafff0">
   <h1>Smart Diorama</h1>
-  <img src="4.jpg" class="custom-icon" id="mainIcon">
+  <img src="4.png" class="custom-icon" id="mainIcon">
   <div class="card-container">
     <div class="card"><h4>Bụi</h4><h2 id="buiVal">--</h2></div>
     <div class="card"><h4>Đèn</h4><h2 id="denVal">--%</h2></div>
@@ -33,9 +33,9 @@
           document.getElementById('buiVal').innerText = b;
           document.getElementById('denVal').innerText = dn + '%';
           let img = document.getElementById('mainIcon');
-          if(b < 1500) { img.src='4.jpg'; document.body.style.background='#eafff0'; }
-          else if(b < 2500) { img.src='5.jpg'; document.body.style.background='#fffde7'; }
-          else { img.src='6.jpg'; document.body.style.background='#ffebee'; }
+          if(b < 1500) { img.src='4.png'; document.body.style.background='#eafff0'; }
+          else if(b < 2500) { img.src='5.png'; document.body.style.background='#fffde7'; }
+          else { img.src='6.png'; document.body.style.background='#ffebee'; }
         });
     }
     setInterval(update, 3000); // Tốc độ quét 3s/lần cực nhanh
